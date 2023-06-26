@@ -1,6 +1,6 @@
 /**
  *
- * Created on 13/06/2023 By: Tan Bunchhay
+ * Created on 26/06/2023 By: Tan Bunchhay
  */
 
 // require header
@@ -12,10 +12,8 @@ using namespace std;
 #if __APPLE__
 #include <GLUT/glut.h>
 #elif _WIN64
-
 #include <GL/glut.h>
 #include <iostream>
-
 #endif
 
 using namespace std;
