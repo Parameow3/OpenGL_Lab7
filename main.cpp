@@ -1,6 +1,6 @@
 /**
  *
- * Created on 01/06/2023 By: Tan Bunchhay
+ * Created on 13/06/2023 By: Tan Bunchhay
  */
 
 // require header
@@ -12,77 +12,88 @@ using namespace std;
 #if __APPLE__
 #include <GLUT/glut.h>
 #elif _WIN64
+
 #include <GL/glut.h>
 #include <iostream>
+
 #endif
 
 using namespace std;
 
-int submenu_Drawing;
+//#region VARIABLES
+int submenu_ResizeClippingRegion;
+int valueClippingSize;
 int submenu_Color;
-int submenu_Width;
+int valueColor;
 int menu;
-int valueDrawing = 0;
-int valueColor = 0;
-int valueWidth = 0;
-int ix1,ix2,iy1,iy2;
-
-void display(void);
-void init(void);
-void selectMenu(int n);
-void createMenu();
-void reqInput();
-void changeLineWidth();
-void changeLineColor();
-
-
-//#region MIDPOINT_ALGORITHM_predefine
-void changeLineDrawing();
-void ddaLine(int x1, int x2, int y1, int y2);
-void midpointLine(int x1, int x2, int y1, int y2);
-void midpointCircle(int x, int y, int r);
-void pointsCircle(int x, int y, int ix, int iy);
-void digitalApproximation();
 //#endregion
 
+//#region PRE-DEFINE
+void display(void);
 
-int main(int argc, char **argv) {
-    glutInit(&argc, argv);
-    glutInitWindowSize(1000, 500);
-    glutInitWindowPosition(200, 200);
-    menu = glutCreateWindow("Menu");
-    createMenu();
-    init();
-//    reqInput();
-    glutDisplayFunc(display);
-    glutMainLoop();
+void init(void);
 
-    return 0;
-}
+void selectMenu(int n);
 
-//#region BRONZE_CHALLENGE
+void createMenu();
+
+void drawClippingRegion(int w, int h);
+
+void resizeClippingRegion();
+//#endregion
 
 void display(void) {
     // clear background of current window
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();// Reset the model-view matrix
-    gluOrtho2D(0, 1000.0, 0, 500.0);
+    gluOrtho2D(0, 1000.0, 0, 600.0);
 
-    glColor3f(0,0,0);
+    glColor3f(0, 0, 0);
 
-    midpointCircle(250, 250, 200);
-
-    digitalApproximation();
-
-    midpointCircle(750, 250, 200);
-
-    changeLineColor();
-    changeLineWidth();
-    changeLineDrawing();
+    resizeClippingRegion();
 
     glFlush();
 }
 
+//#region CLIPPING_METHOD
+void resizeClippingRegion() {
+    switch (valueClippingSize) {
+        case 1:
+            drawClippingRegion(300, 150);
+            break;
+        case 2:
+            drawClippingRegion(500, 250);
+            break;
+        case 3:
+            drawClippingRegion(800, 400);
+            break;
+    }
+
+}
+
+void drawClippingRegion(int w, int h) {
+    int x1, x2, x3, x4;
+    int y1, y2, y3, y4;
+
+    x1 = 500 - (w/2);
+    y1 = 300 + (h/2);
+    x2 = 500 + (w/2);
+    y2 = y1;
+    x3 = x2;
+    y3 = 300 - (h/2);
+    x4 = x1;
+    y4 = y3;
+
+    glBegin(GL_LINE_LOOP);
+    glVertex2i(x1, y1);
+    glVertex2i(x2, y2);
+    glVertex2i(x3, y3);
+    glVertex2i(x4, y4);
+    glEnd();
+}
+//#endregion
+
+//#region START_PROGRAM
 void init(void) {
     //Clear background color to white
     glClearColor(1.0, 0.8980, 0.8, 0.0);
@@ -93,61 +104,59 @@ void init(void) {
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
 }
 
-void selectMenu(int n){
+int main(int argc, char **argv) {
+    glutInit(&argc, argv);
+    glutInitWindowSize(1000, 600);
+    glutInitWindowPosition(200, 200);
+    menu = glutCreateWindow("Menu");
+    createMenu();
+    init();
+//    reqInput();
+    glutDisplayFunc(display);
+    glutMainLoop();
+
+    return 0;
+}
+//#endregion
+
+//#region MENU_TAB
+void selectMenu(int n) {
     // if n = 0, exit the program
-    if (n == 0)
-    {
+    if (n == 0) {
         glutDestroyWindow(menu);
         exit(0);
+    } else if (n > 0 && n < 4) {
+        valueClippingSize = n;
+    } else if (n > 5 && n < 9) {
+        valueColor = n;
+    } else if (n == 4) {
+
+    } else if (n == 5) {
+
     }
 
-    else if(n > 0 && n < 3)
-    {
-        valueDrawing = n;
-    }
-    else if(n > 2 && n < 6)
-    {
-        valueColor = n;
-    }
-    else if(n > 5 && n < 10)
-    {
-        valueWidth = n;
-    }
-    // re-paint display
     glutPostRedisplay();
 }
 
-void createMenu(){
+void createMenu() {
 
     // for line drawing
-    submenu_Drawing = glutCreateMenu(selectMenu);
+    submenu_ResizeClippingRegion = glutCreateMenu(selectMenu);
     // the selectColor is the function that will
     // create in order to response when the user
     // select on each item on the menu
-    glutAddMenuEntry("DDA Line", 1);
-    glutAddMenuEntry("Midpoint Line", 2);
-    glutAddMenuEntry("Trigonometry Circle", 10);
-    glutAddMenuEntry("Midpoint Circle", 11);
+    glutAddMenuEntry("300 x 150", 1);
+    glutAddMenuEntry("500 x 250", 2);
+    glutAddMenuEntry("800 x 400", 3);
 
-
-    // for line color changing
+    // for clip color
     submenu_Color = glutCreateMenu(selectMenu);
     // the selectColor is the function that will
     // create in order to response when the user
     // select on each item on the menu
-    glutAddMenuEntry("Black", 3);
-    glutAddMenuEntry("Red", 4);
-    glutAddMenuEntry("Blue", 5);
-
-    // for line width changing
-    submenu_Width = glutCreateMenu(selectMenu);
-    // the selectColor is the function that will
-    // create in order to response when the user
-    // select on each item on the menu
-    glutAddMenuEntry("1", 6);
-    glutAddMenuEntry("3", 7);
-    glutAddMenuEntry("6", 8);
-    glutAddMenuEntry("9", 9);
+    glutAddMenuEntry("Red", 6);
+    glutAddMenuEntry("Orange", 7);
+    glutAddMenuEntry("Pink", 8);
 
 
     menu = glutCreateMenu(selectMenu);
@@ -155,241 +164,13 @@ void createMenu(){
     // create in order to response when the user
     // select on each item on the menu
 
-    glutAddSubMenu("Drawing", submenu_Drawing);
-    glutAddSubMenu("Color", submenu_Color);
-    glutAddSubMenu("Line Width", submenu_Width);
+    glutAddMenuEntry("Add Lines", 4);
+    glutAddMenuEntry("Clip", 5);
+    glutAddSubMenu("Drawing", submenu_ResizeClippingRegion);
+    glutAddSubMenu("Clip Color", submenu_Color);
     glutAddMenuEntry("Exit", 0); // add exit to menu
     // attach menu to the right button of the mouse
     glutAttachMenu(GLUT_RIGHT_BUTTON);
 
 }
-
-//#region MIDPOINT_ALGORITHM
-void ddaLine(int x1, int x2, int y1, int y2){
-    int deltaX = x2 - x1;
-    int deltaY = y2 - y1;
-    double x = x1;
-    double y = y1;
-    double slope, step;
-    bool slopeInfinite = false;
-
-    // prevent infinite value
-    if (deltaX != 0){
-        slope = (double) deltaY / deltaX;
-    } else {
-        slopeInfinite = true;
-    }
-
-    // check slope Infinite
-    if (slopeInfinite || slope > 1){
-        step = deltaY;
-    } else{
-        step = deltaX;
-    }
-
-    // find increment of x and y
-    double xInc = (double) deltaX / step;
-    double yInc = (double) deltaY / step;
-
-    glBegin(GL_POINTS);
-    for (int i = 0; i < step; ++i) {
-        glVertex2i(round(x), round(y));
-        x += xInc;
-        y += yInc;
-    }
-    glEnd();
-}
-
-void pointsCircle(int x, int y, int ix, int iy) {
-    glVertex2i(x + ix, y + iy);
-    glVertex2i(y + ix, x + iy);
-    glVertex2i(-x + ix, y + iy);
-    glVertex2i(-y + ix, x + iy);
-    glVertex2i(-y + ix, -x + iy);
-    glVertex2i(-x + ix, -y + iy);
-    glVertex2i(x + ix, -y + iy);
-    glVertex2i(y + ix, -x + iy);
-}
-
-void midpointLine(int x1, int x2, int y1, int y2){
-    int deltaX = x2 - x1;
-    int deltaY = y2 - y1;
-    int decision = (2 * deltaY) - deltaX;
-    int dE = 2 * deltaY;
-    int dNE = 2 * (deltaY - deltaX);
-    int x = x1;
-    int y = y1;
-
-    glBegin(GL_POINTS);
-    while(x < x2){
-        glVertex2i(x, y);
-        if (decision <= 0){
-            decision += dE;
-            x += 1;
-        } else{
-            decision += dNE;
-            x += 1;
-            y += 1;
-        }
-    }
-    glEnd();
-}
-
-void changeLineDrawing(){
-    // DDA LINE
-    if(valueDrawing == 1 || valueDrawing == 0){
-        ddaLine(ix1, ix2, iy1, iy2);
-    }
-    // MIDPOINT LINE
-    else if (valueDrawing == 2){
-        midpointLine(ix1, ix2, iy1, iy2);
-    }
-}
 //#endregion
-
-
-void midpointCircle(int ix, int iy, int r){
-    int x = 0;
-    int y = r;
-    double d = (5.0/4.0) - r;
-    glBegin(GL_POINTS);
-    glVertex2i(ix, iy);
-    pointsCircle(x, y, ix, iy);
-    while(y > x)
-    {
-        if(d < 0){
-            d += (2*x) + 3; x +=1;
-        }
-        else{
-            d += (2*x) - (2*y) + 5;
-            x += 1;
-            y -= 1;
-        }
-        pointsCircle(x, y, ix, iy);
-    }
-    glEnd();
-
-}
-
-void digitalApproximation(){
-    int x = 500;
-    int y = 500;
-
-    for (int j = 50; j <= 500; j+=50) {
-        for (int i = 50; i <= 500; i+=50) {
-            glBegin(GL_LINE_LOOP);
-            glVertex2i(x, y); // top left
-            glVertex2i(x+i, y); // top right
-            glVertex2i(x+i, y-j); // bottom right
-            glVertex2i(x, y-j); // bottom left
-            glEnd();
-        }
-    }
-
-    glColor3f(0,0,1);
-    glBegin(GL_QUADS);
-    for (int i = 0; i < 200; i+=50) {
-
-        // top line
-        glVertex2i(650 + i, 450); // top left
-        glVertex2i(650 + 50 + i, 450); // top right
-        glVertex2i(650 + 50 + i, 400); // bottom right
-        glVertex2i(650 + i, 400); // bottom left
-
-        // bottom line
-        glVertex2i(650 + i, 100); // top left
-        glVertex2i(650 + 50 + i, 100); // top right
-        glVertex2i(650 + 50 + i, 50); // bottom right
-        glVertex2i(650 + i, 50); // bottom left
-
-        // left line
-        glVertex2i(550, 150 + 50 + i); // top left
-        glVertex2i(600, 150 + 50+ i); // top right
-        glVertex2i(600, 150 + i); // bottom right
-        glVertex2i(550, 150 + i); // bottom left
-
-        // right line
-        glVertex2i(900, 150 + 50 + i); // top left
-        glVertex2i(950, 150 + 50+ i); // top right
-        glVertex2i(950, 150 + i); // bottom right
-        glVertex2i(900, 150 + i); // bottom left
-
-
-    }
-
-    // 4 edges
-    // top left
-    glVertex2i(600, 400); // top left
-    glVertex2i(650, 400); // top right
-    glVertex2i(650, 350); // bottom right
-    glVertex2i(600, 350); // bottom left
-
-    // top right
-    glVertex2i(850, 400); // top left
-    glVertex2i(900, 400); // top right
-    glVertex2i(900, 350); // bottom right
-    glVertex2i(850, 350); // bottom left
-
-
-    // bottom left
-    glVertex2i(600, 150); // top left
-    glVertex2i(650, 150); // top right
-    glVertex2i(650, 100); // bottom right
-    glVertex2i(600, 100); // bottom left
-
-    // bottom right
-    glVertex2i(850, 150); // top left
-    glVertex2i(900, 150); // top right
-    glVertex2i(900, 100); // bottom right
-    glVertex2i(850, 100); // bottom left
-
-    glEnd();
-
-}
-
-void changeLineColor(){
-    if (valueColor == 3){
-        glPushMatrix();
-        glColor3f(0.0, 0.0, 0.0);
-        glPopMatrix();
-    } else if (valueColor == 4){
-        glPushMatrix();
-        glColor3f(1.0, 0.0, 0.0);
-        glPopMatrix();
-    }
-    else if (valueColor == 5){
-        glPushMatrix();
-        glColor3f(0.0, 0.0, 1.0);
-        glPopMatrix();
-    }
-}
-
-void changeLineWidth(){
-    if (valueWidth == 6){
-        glPushMatrix();
-        glPointSize(1);
-        glPopMatrix();
-    } else if (valueWidth == 7){
-        glPushMatrix();
-        glPointSize(3);
-        glPopMatrix();
-    }
-    else if (valueWidth == 8){
-        glPushMatrix();
-        glPointSize(6);
-        glPopMatrix();
-    }
-    else if (valueWidth == 9){
-        glPushMatrix();
-        glPointSize(9);
-        glPopMatrix();
-    }
-}
-
-void reqInput(){
-    cout << "Please Input:" << endl;
-    cout << " x1: "; cin >> ix1;
-    cout << "y1: "; cin >> iy1;
-    cout << "x2: "; cin >> ix2;
-    cout << "y2: "; cin >> iy2;
-}
