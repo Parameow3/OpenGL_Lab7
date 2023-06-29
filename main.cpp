@@ -66,7 +66,6 @@ void resizeClippingRegion() {
             drawClippingRegion(800, 400);
             break;
     }
-
 }
 
 void drawClippingRegion(int w, int h) {
@@ -162,9 +161,9 @@ void createMenu() {
     // create in order to response when the user
     // select on each item on the menu
 
+    glutAddSubMenu("Resize Clipping Region", submenu_ResizeClippingRegion);
     glutAddMenuEntry("Add Lines", 4);
     glutAddMenuEntry("Clip", 5);
-    glutAddSubMenu("Drawing", submenu_ResizeClippingRegion);
     glutAddSubMenu("Clip Color", submenu_Color);
     glutAddMenuEntry("Exit", 0); // add exit to menu
     // attach menu to the right button of the mouse
