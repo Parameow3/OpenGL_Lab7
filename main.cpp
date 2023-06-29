@@ -21,6 +21,10 @@ using namespace std;
 //#region VARIABLES
 int submenu_ResizeClippingRegion;
 int valueClippingSize;
+int submenu_addLine;
+int valueAddLine;
+int submenu_clipping;
+int valueClipping;
 int submenu_Color;
 int valueColor;
 int menu;
@@ -146,14 +150,33 @@ void createMenu() {
     glutAddMenuEntry("500 x 250", 2);
     glutAddMenuEntry("800 x 400", 3);
 
+
+
+    // for add line
+    submenu_addLine = glutCreateMenu(selectMenu);
+    // the selectColor is the function that will
+    // create in order to response when the user
+    // select on each item on the menu
+    glutAddMenuEntry("Inside", 4);
+    glutAddMenuEntry("Outside", 5);
+    glutAddMenuEntry("Partially in/outside", 6);
+
+    // for clipping line
+    submenu_clipping = glutCreateMenu(selectMenu);
+    // the selectColor is the function that will
+    // create in order to response when the user
+    // select on each item on the menu
+    glutAddMenuEntry("Brute force", 7);
+    glutAddMenuEntry("Cohen-Sutherland", 8);
+
     // for clip color
     submenu_Color = glutCreateMenu(selectMenu);
     // the selectColor is the function that will
     // create in order to response when the user
     // select on each item on the menu
-    glutAddMenuEntry("Red", 6);
-    glutAddMenuEntry("Orange", 7);
-    glutAddMenuEntry("Pink", 8);
+    glutAddMenuEntry("Red", 9);
+    glutAddMenuEntry("Orange", 10);
+    glutAddMenuEntry("Pink", 11);
 
 
     menu = glutCreateMenu(selectMenu);
@@ -162,8 +185,8 @@ void createMenu() {
     // select on each item on the menu
 
     glutAddSubMenu("Resize Clipping Region", submenu_ResizeClippingRegion);
-    glutAddMenuEntry("Add Lines", 4);
-    glutAddMenuEntry("Clip", 5);
+    glutAddSubMenu("Add Lines", submenu_addLine);
+    glutAddSubMenu("Clip", submenu_clipping);
     glutAddSubMenu("Clip Color", submenu_Color);
     glutAddMenuEntry("Exit", 0); // add exit to menu
     // attach menu to the right button of the mouse
